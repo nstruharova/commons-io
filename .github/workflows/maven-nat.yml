@@ -78,7 +78,7 @@ jobs:
     
     
     - name: Initialize Energy Estimation
-      uses: green-coding-berlin/eco-ci-energy-estimation@3f407abfca265dc2d37f2cf889b569a3589f8479 # use hash or @vX here (See note below)
+      uses: green-coding-berlin/eco-ci-energy-estimation@4eec5ab2253f0f13ce9dae785c06d9f8c88e6d44 # use hash or @vX here (See note below)
       with:
         task: start-measurement
 
@@ -87,14 +87,14 @@ jobs:
     
     - name: Build measurement
       if: always()
-      uses: green-coding-berlin/eco-ci-energy-estimation@3f407abfca265dc2d37f2cf889b569a3589f8479 # use hash or @vX here (See note below)
+      uses: green-coding-berlin/eco-ci-energy-estimation@4eec5ab2253f0f13ce9dae785c06d9f8c88e6d44 # use hash or @vX here (See note below)
       with:
         task: get-measurement
         label: 'Build measurement'
 
     - name: Show Energy Results
       if: always()
-      uses: green-coding-berlin/eco-ci-energy-estimation@3f407abfca265dc2d37f2cf889b569a3589f8479 # use hash or @vX here (See note below)
+      uses: green-coding-berlin/eco-ci-energy-estimation@4eec5ab2253f0f13ce9dae785c06d9f8c88e6d44 # use hash or @vX here (See note below)
       id: total-measurement-step
       with:
         task: display-results

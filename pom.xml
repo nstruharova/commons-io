@@ -168,6 +168,54 @@ file comparators, endian transformation classes, and much more.
     <defaultGoal>clean verify apache-rat:check japicmp:cmp checkstyle:check spotbugs:check pmd:check javadoc:javadoc</defaultGoal>
     <pluginManagement>
       <plugins>
+          <!-- Cache compiled classes -->
+          <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>build-helper-maven-plugin</artifactId>
+              <version>3.2.0</version>
+              <executions>
+                  <execution>
+                      <id>attach-artifacts</id>
+                      <phase>compile</phase>
+                      <goals>
+                          <goal>add-source</goal>
+                      </goals>
+                      <configuration>
+                          <sources>
+                              <source>target/classes/</source>
+                          </sources>
+                      </configuration>
+                  </execution>
+              </executions>
+          </plugin>
+          
+          <!-- Use cached classes in testCompile -->
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-dependency-plugin</artifactId>
+              <version>3.1.2</version>
+              <executions>
+                  <execution>
+                      <id>copy-test-classes</id>
+                      <phase>testCompile</phase>
+                      <goals>
+                          <goal>copy</goal>
+                      </goals>
+                      <configuration>
+                          <artifactItems>
+                              <artifactItem>
+                                  <groupId>your.group.id</groupId>
+                                  <artifactId>your-artifact-id</artifactId>
+                                  <version>${project.version}</version>
+                                  <type>jar</type>
+                                  <includes>**/*.class</includes>
+                                  <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                              </artifactItem>
+                          </artifactItems>
+                      </configuration>
+                  </execution>
+              </executions>
+          </plugin>
         <plugin>
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
@@ -188,14 +236,7 @@ file comparators, endian transformation classes, and much more.
             <enableRulesSummary>false</enableRulesSummary>
             <includeTestSourceDirectory>true</includeTestSourceDirectory>
           </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <configuration>
-            <encoding>UTF-8</encoding>
-          </configuration>
-        </plugin>     
+        </plugin>      
       </plugins>
     </pluginManagement>
     <plugins>
@@ -278,10 +319,18 @@ file comparators, endian transformation classes, and much more.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
+        <executions>
+          <execution>
+              <goals>
+                  <goal>cmp</goal>
+              </goals>
+          </execution>
+      </executions>
         <configuration>
           <rulesets>
             <ruleset>src/conf/maven-pmd-plugin.xml</ruleset>
           </rulesets>
+          <oldClassPath>${project.build.outputDirectory}</oldClassPath>
 		</configuration>
       </plugin>
     </plugins>
