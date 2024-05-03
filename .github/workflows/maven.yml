@@ -32,12 +32,12 @@ permissions:
 jobs:
   build:
 
-    runs-on: ${{ matrix.os }}
+    runs-on: self-hosted
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        java: [ 8, 11, 17, 21 ]
+        java: [ 8 ]
         experimental: [false]
         include:
           # Update java 8/ubuntu to add deploy step
@@ -76,7 +76,7 @@ jobs:
         server-username: NEXUS_USER # env variable for username in deploy
         server-password: NEXUS_PW # env variable for token in deploy
     - name: Build with Maven
-      run: mvn --show-version --batch-mode --no-transfer-progress -DtrimStackTrace=false
+      run: mvn -Dproject.build.sourceEncoding=UTF-8 --show-version --batch-mode --no-transfer-progress -DtrimStackTrace=false
     - name: Deploy SNAPSHOT using minimal build
       if: matrix.deploy && github.repository == 'apache/commons-io' && github.ref_name == 'master' 
       env:
