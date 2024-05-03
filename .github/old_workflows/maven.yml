@@ -37,27 +37,27 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        java: [ 11, 17, 21 ]
+        java: [ 8, 11, 17, 21 ]
         experimental: [false]
         include:
-          # Update java 21/ubuntu to add deploy step
-          - java: 21
+          # Update java 8/ubuntu to add deploy step
+          - java: 8
             os: ubuntu-latest
             experimental: false
             deploy: true
-#          - java: 23-ea
+#          - java: 22-ea
 #            os: ubuntu-latest
 #            experimental: true        
-#          - java: 23-ea
+#          - java: 22-ea
 #            os: windows-latest
 #            experimental: true        
-#          - java: 23-ea
+#          - java: 22-ea
 #            os: macos-latest
 #            experimental: true        
       fail-fast: false
         
     steps:
-    - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+    - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
       with:
         persist-credentials: false
     - uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2

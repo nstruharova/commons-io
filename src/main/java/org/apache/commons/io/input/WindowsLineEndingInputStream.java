@@ -28,7 +28,7 @@ import java.io.InputStream;
  *
  * @since 2.5
  */
-public class WindowsLineEndingInputStream extends InputStream {
+public class WindowsLineEndingInputStream  extends InputStream {
 
     private boolean atEos;
 
@@ -40,17 +40,17 @@ public class WindowsLineEndingInputStream extends InputStream {
 
     private boolean injectSlashLf;
 
-    private final boolean lineFeedAtEos;
+    private final boolean lineFeedAtEndOfFile;
 
     /**
-     * Constructs an input stream that filters another stream.
+     * Constructs an input stream that filters another stream
      *
-     * @param in                        The input stream to wrap.
-     * @param lineFeedAtEos true to ensure that the stream ends with CRLF.
+     * @param in                        The input stream to wrap
+     * @param ensureLineFeedAtEndOfFile true to ensure that the file ends with CRLF
      */
-    public WindowsLineEndingInputStream(final InputStream in, final boolean lineFeedAtEos) {
+    public WindowsLineEndingInputStream(final InputStream in, final boolean ensureLineFeedAtEndOfFile) {
         this.in = in;
-        this.lineFeedAtEos = lineFeedAtEos;
+        this.lineFeedAtEndOfFile = ensureLineFeedAtEndOfFile;
     }
 
     /**
@@ -67,10 +67,10 @@ public class WindowsLineEndingInputStream extends InputStream {
     /**
      * Handles the end of stream condition.
      *
-     * @return The next char to output to the stream.
+     * @return The next char to output to the stream
      */
     private int handleEos() {
-        if (!lineFeedAtEos) {
+        if (!lineFeedAtEndOfFile) {
             return EOF;
         }
         if (!atSlashLf && !atSlashCr) {
@@ -106,12 +106,7 @@ public class WindowsLineEndingInputStream extends InputStream {
             return LF;
         }
         final boolean prevWasSlashR = atSlashCr;
-        final int target = in.read();
-        atEos = target == EOF;
-        if (!atEos) {
-            atSlashCr = target == CR;
-            atSlashLf = target == LF;
-        }
+        final int target = readWithUpdate();
         if (atEos) {
             return handleEos();
         }
@@ -119,6 +114,22 @@ public class WindowsLineEndingInputStream extends InputStream {
             injectSlashLf = true;
             return CR;
         }
+        return target;
+    }
+
+    /**
+     * Reads the next item from the target, updating internal flags in the process
+     * @return the next int read from the target stream
+     * @throws IOException upon error
+     */
+    private int readWithUpdate() throws IOException {
+        final int target = this.in.read();
+        atEos = target == EOF;
+        if (atEos) {
+            return target;
+        }
+        atSlashCr = target == CR;
+        atSlashLf = target == LF;
         return target;
     }
 }

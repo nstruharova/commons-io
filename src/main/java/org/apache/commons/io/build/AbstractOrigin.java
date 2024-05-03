@@ -525,7 +525,7 @@ public abstract class AbstractOrigin<T, B extends AbstractOrigin<T, B>> extends 
      */
     public File getFile() {
         throw new UnsupportedOperationException(
-                String.format("%s#getFile() for %s origin %s", getSimpleClassName(), origin.getClass().getSimpleName(), origin));
+                String.format("%s#getFile() for %s origin %s", getSimpleName(), origin.getClass().getSimpleName(), origin));
     }
 
     /**
@@ -560,7 +560,7 @@ public abstract class AbstractOrigin<T, B extends AbstractOrigin<T, B>> extends 
      */
     public Path getPath() {
         throw new UnsupportedOperationException(
-                String.format("%s#getPath() for %s origin %s", getSimpleClassName(), origin.getClass().getSimpleName(), origin));
+                String.format("%s#getPath() for %s origin %s", getSimpleName(), origin.getClass().getSimpleName(), origin));
     }
 
     /**
@@ -574,7 +574,7 @@ public abstract class AbstractOrigin<T, B extends AbstractOrigin<T, B>> extends 
         return Files.newBufferedReader(getPath(), charset);
     }
 
-    private String getSimpleClassName() {
+    private String getSimpleName() {
         return getClass().getSimpleName();
     }
 
@@ -604,6 +604,6 @@ public abstract class AbstractOrigin<T, B extends AbstractOrigin<T, B>> extends 
 
     @Override
     public String toString() {
-        return getSimpleClassName() + "[" + origin.toString() + "]";
+        return getSimpleName() + "[" + origin.toString() + "]";
     }
 }

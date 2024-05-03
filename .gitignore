@@ -20,3 +20,10 @@ site-content
 
 ### Ignore Visual Studio code files
 /.vscode/
+
+#Doxy + macOS
+xml/
+html/
+*.DS_Store
+DoxyLog
+Doxyfile

@@ -29,7 +29,6 @@ import java.util.Random;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.charset.CharsetDecoders;
-import org.apache.commons.lang3.SystemProperties;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -125,7 +124,7 @@ public class WriterOutputStreamTest {
         try {
             testWithBufferedWrite(TEST_STRING, UTF_16);
         } catch (final UnsupportedOperationException e) {
-            if (!SystemProperties.getJavaVendor().contains("IBM")) {
+            if (!System.getProperty("java.vendor").contains("IBM")) {
                 fail("This test should only throw UOE on IBM JDKs with broken UTF-16");
             }
         }
@@ -136,7 +135,7 @@ public class WriterOutputStreamTest {
         try {
             testWithSingleByteWrite(TEST_STRING, UTF_16);
         } catch (final UnsupportedOperationException e){
-            if (!SystemProperties.getJavaVendor().contains("IBM")){
+            if (!System.getProperty("java.vendor").contains("IBM")){
                 fail("This test should only throw UOE on IBM JDKs with broken UTF-16");
             }
         }

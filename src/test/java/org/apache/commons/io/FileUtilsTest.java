@@ -87,7 +87,6 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.io.test.TestUtils;
-import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -1093,7 +1092,7 @@ public class FileUtilsTest extends AbstractTempDirTest {
         subDir.mkdir();
         final File subFile = new File(subDir, "A.txt");
         FileUtils.writeStringToFile(subFile, "HELLO WORLD", "UTF8");
-        final File destDir = new File(SystemProperties.getJavaIoTmpdir(), "tmp-FileUtilsTestCase");
+        final File destDir = new File(System.getProperty("java.io.tmpdir"), "tmp-FileUtilsTestCase");
         FileUtils.deleteDirectory(destDir);
         destDir.mkdirs();
 
@@ -1874,18 +1873,18 @@ public class FileUtilsTest extends AbstractTempDirTest {
 
     @Test
     public void testGetTempDirectoryPath() {
-        assertEquals(SystemProperties.getJavaIoTmpdir(), FileUtils.getTempDirectoryPath());
+        assertEquals(System.getProperty("java.io.tmpdir"), FileUtils.getTempDirectoryPath());
     }
 
     @Test
     public void testGetUserDirectory() {
-        final File userDirectory = new File(SystemProperties.getUserHome());
+        final File userDirectory = new File(System.getProperty("user.home"));
         assertEquals(userDirectory, FileUtils.getUserDirectory());
     }
 
     @Test
     public void testGetUserDirectoryPath() {
-        assertEquals(SystemProperties.getUserHome(), FileUtils.getUserDirectoryPath());
+        assertEquals(System.getProperty("user.home"), FileUtils.getUserDirectoryPath());
     }
 
     @Test
