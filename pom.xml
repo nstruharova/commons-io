@@ -1,18 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>	
-<!--	
-   Licensed to the Apache Software Foundation (ASF) under one or more	
-   contributor license agreements.  See the NOTICE file distributed with	
-   this work for additional information regarding copyright ownership.	
-   The ASF licenses this file to You under the Apache License, Version 2.0	
-   (the "License"); you may not use this file except in compliance with	
-   the License.  You may obtain a copy of the License at	
-       http://www.apache.org/licenses/LICENSE-2.0	
-   Unless required by applicable law or agreed to in writing, software	
-   distributed under the License is distributed on an "AS IS" BASIS,	
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.	
-   See the License for the specific language governing permissions and	
-   limitations under the License.	
---><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-parent</artifactId>
@@ -65,14 +68,14 @@ file comparators, endian transformation classes, and much more.
       <scope>test</scope>
     </dependency>
     <dependency>
-      
+      <!-- Java 21 support, revisit for Mockito 5 -->
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy</artifactId>
       <version>${commons.bytebuddy.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      
+      <!-- Java 21 support, revisit for Mockito 5 -->
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy-agent</artifactId>
       <version>${commons.bytebuddy.version}</version>
@@ -130,13 +133,13 @@ file comparators, endian transformation classes, and much more.
     <commons.jira.id>IO</commons.jira.id>
     <commons.jira.pid>12310477</commons.jira.pid>
     <commons.osgi.export>
-        
+        <!-- Explicit list of packages from IO 1.4 -->
         org.apache.commons.io;
         org.apache.commons.io.comparator;
         org.apache.commons.io.filefilter;
         org.apache.commons.io.input;
         org.apache.commons.io.output;version=1.4.9999;-noimport:=true,
-        
+        <!-- Same list plus * for new packages -->
         org.apache.commons.io;
         org.apache.commons.io.comparator;
         org.apache.commons.io.filefilter;
@@ -145,7 +148,7 @@ file comparators, endian transformation classes, and much more.
         org.apache.commons.io.*;version=${project.version};-noimport:=true
     </commons.osgi.export>
     <commons.osgi.import>
-        
+        <!-- IO-734 - Make the sun.* references from BufferedFileChannelInputStream optional -->
         sun.nio.ch;resolution:=optional,
         sun.misc;resolution:=optional,
         *
@@ -161,10 +164,58 @@ file comparators, endian transformation classes, and much more.
   </properties>
 
   <build>
-    
+    <!-- japicmp:cmp needs package to work from a jar -->
     <defaultGoal>clean verify apache-rat:check japicmp:cmp checkstyle:check spotbugs:check pmd:check javadoc:javadoc</defaultGoal>
     <pluginManagement>
       <plugins>
+          <!-- Cache compiled classes -->
+          <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>build-helper-maven-plugin</artifactId>
+              <version>3.2.0</version>
+              <executions>
+                  <execution>
+                      <id>attach-artifacts</id>
+                      <phase>compile</phase>
+                      <goals>
+                          <goal>add-source</goal>
+                      </goals>
+                      <configuration>
+                          <sources>
+                              <source>target/classes/</source>
+                          </sources>
+                      </configuration>
+                  </execution>
+              </executions>
+          </plugin>
+          
+          <!-- Use cached classes in testCompile -->
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-dependency-plugin</artifactId>
+              <version>3.1.2</version>
+              <executions>
+                  <execution>
+                      <id>copy-test-classes</id>
+                      <phase>testCompile</phase>
+                      <goals>
+                          <goal>copy</goal>
+                      </goals>
+                      <configuration>
+                          <artifactItems>
+                              <artifactItem>
+                                  <groupId>your.group.id</groupId>
+                                  <artifactId>your-artifact-id</artifactId>
+                                  <version>${project.version}</version>
+                                  <type>jar</type>
+                                  <includes>**/*.class</includes>
+                                  <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                              </artifactItem>
+                          </artifactItems>
+                      </configuration>
+                  </execution>
+              </executions>
+          </plugin>
         <plugin>
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
@@ -186,7 +237,7 @@ file comparators, endian transformation classes, and much more.
             <includeTestSourceDirectory>true</includeTestSourceDirectory>
           </configuration>
         </plugin>      
-      <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.12.1</version><configuration><source>8</source><target>8</target><useIncrementalCompilation>false</useIncrementalCompilation><excludes><exclude>**/*.java</exclude></excludes><testExcludes><testExclude>**/*.java</testExclude></testExcludes></configuration></plugin></plugins>
+      </plugins>
     </pluginManagement>
     <plugins>
       <plugin>
@@ -216,17 +267,17 @@ file comparators, endian transformation classes, and much more.
           </classpathDependencyExcludes>
           <forkCount>1</forkCount>
           <reuseForks>false</reuseForks>
-          
-          
+          <!-- Limit memory size see IO-161 -->
+          <!-- Mockito inline may need -XX:+EnableDynamicAgentLoading -->
           <argLine>${argLine} -Xmx25M</argLine>
           <includes>
-            
+            <!-- Only include test classes, not test data -->
             <include>**/*Test*.class</include>
           </includes>
           <excludes>
             <exclude>**/*AbstractTestCase*</exclude>
             <exclude>**/testtools/**</exclude>
-            
+            <!-- https://issues.apache.org/jira/browse/SUREFIRE-44 -->
             <exclude>**/*$*</exclude>
           </excludes>
         </configuration>
@@ -268,10 +319,18 @@ file comparators, endian transformation classes, and much more.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
+        <executions>
+          <execution>
+              <goals>
+                  <goal>cmp</goal>
+              </goals>
+          </execution>
+      </executions>
         <configuration>
           <rulesets>
             <ruleset>src/conf/maven-pmd-plugin.xml</ruleset>
           </rulesets>
+          <oldClassPath>${project.build.outputDirectory}</oldClassPath>
 		</configuration>
       </plugin>
     </plugins>
@@ -296,7 +355,7 @@ file comparators, endian transformation classes, and much more.
         <configuration>
           <parameter>
 			 <excludes>
-               
+               <!-- False positive: https://github.com/siom79/japicmp/issues/365 -->
                <exclude>org.apache.commons.io.StreamIterator</exclude>
              </excludes>
           </parameter>
@@ -380,7 +439,7 @@ file comparators, endian transformation classes, and much more.
                   <executable>java</executable>
                   <arguments>
                     <argument>-classpath</argument>
-                    <classpath />
+                    <classpath/>
                     <argument>org.openjdk.jmh.Main</argument>
                     <argument>-rf</argument>
                     <argument>json</argument>
@@ -409,7 +468,7 @@ file comparators, endian transformation classes, and much more.
     </developer>
     <developer>
       <name>dIon Gillard</name>
-      
+      <!-- Note: first name is correctly capitalised above -->
       <id>dion</id>
       <email>dion@apache.org</email>
       <organization />
@@ -585,7 +644,7 @@ file comparators, endian transformation classes, and much more.
       <name>Arturo Bernal</name>
     </contributor>
     <contributor>
-      <name>Miguel Mu&#241;oz</name>
+      <name>Miguel Muñoz</name>
     </contributor>
   </contributors>
 
